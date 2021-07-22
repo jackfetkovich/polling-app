@@ -43,6 +43,8 @@ module.exports = (err, req, res, next) => {
   if(process.env.NODE_ENV === 'production'){
     if(err.code === 11000) return handleDuplicateKeyError(err, res);
     sendErrorProd(err, res);
+  }else {
+    sendErrorDev(err, res)
   }
   
 }

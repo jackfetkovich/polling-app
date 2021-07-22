@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
 		min: [6, 'Username must be at least 6 characters long'],
 		validate: {
 			validator: function (username) {
-				return !filter.isProfane(username)
+				return !filter.isProfane(username);
 			},
 			message: 'Username cannot contain profanity',
 		},
@@ -43,6 +43,7 @@ const userSchema = new mongoose.Schema({
 			message: 'Passwords do not match',
 		},
 	},
+	passwordChangedAt: Date,
 });
 
 userSchema.pre('save', async function (next) {
@@ -53,11 +54,23 @@ userSchema.pre('save', async function (next) {
 	next();
 });
 
+userSchema.pre('save', function (next) {
+	if (this.isModified('password')) {
+		this.passwordChangedAt = Date.now() - 1000;
+	}
+
+	next();
+});
+
 userSchema.methods.correctPassword = async function (
 	candidatePassword,
 	password
 ) {
 	return await bcrypt.compare(candidatePassword, password);
+};
+
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+	return parseInt(this.passwordChangedAt.getTime() / 1000, 10) > JWTTimestamp;
 };
 
 const User = mongoose.model('User', userSchema);

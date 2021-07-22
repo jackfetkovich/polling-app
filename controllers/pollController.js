@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Poll = require('../models/pollModel');
+const catchAsync = require('../utils/catchAsync');
 
 exports.getPolls = async (req, res, next) => {
 	try {
@@ -55,13 +56,12 @@ exports.getPoll = async (req, res, next) => {
 	}
 };
 
-exports.respondToPoll = async (req, res, next) => {
-	try {
-		const { user, choice } = req.body;
+exports.respondToPoll = catchAsync(async (req, res, next) => {
+	
+		const { choice } = req.body;
 		const poll = await Poll.findById(req.params.id);
-
-		poll.removePreviousVotes(user);
-		poll.choices.id(choice).votes.push({ user });
+		poll.removePreviousVotes(req.user.id);
+		poll.choices.id(choice).votes.push({ user: req.user.id });
 		await poll.save();
 		
 		res.status(200).json({
@@ -70,10 +70,5 @@ exports.respondToPoll = async (req, res, next) => {
 				poll,
 			},
 		});
-	} catch (e) {
-		res.status(400).json({
-			status: 'fail',
-			error: e.message,
-		});
-	}
-};
+
+});
