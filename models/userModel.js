@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
 		min: [6, 'Username must be at least 6 characters long'],
 		validate: {
 			validator: function (username) {
-				return filter.clean(username) === username;
+				return !filter.isProfane(username)
 			},
 			message: 'Username cannot contain profanity',
 		},

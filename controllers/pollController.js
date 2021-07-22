@@ -57,25 +57,27 @@ exports.getPoll = async (req, res, next) => {
 
 exports.respondToPoll = async (req, res, next) => {
 	try {
-		const poll = await Poll.find({ _id: req.params.id });
-		poll[0].choices.forEach(choice => {
-			if(choice._id == req.body.choice){
-				choice.count += 1;
-			}
-		})
-		
-		const newPoll = await Poll.findByIdAndUpdate(req.params.id, poll[0], {new: true})
-		
-		res.status(201).json({
-			status: 'sucess',
+		console.log('hit func');
+		const { user, choice } = req.body;
+		const poll = await Poll.findById(req.params.id);
+		console.log('Found Poll');
+
+		poll.choices.id(choice).votes.push({ user });
+		console.log('pushed choice');
+
+		await poll.save();
+		console.log('saved');
+
+		res.status(200).json({
+			status: 'success',
 			data: {
-				newPoll,
+				poll,
 			},
 		});
 	} catch (e) {
 		res.status(400).json({
 			status: 'fail',
-			error: e,
+			error: e.message,
 		});
 	}
 };

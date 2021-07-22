@@ -20,6 +20,7 @@ mongoose
 	.then(console.log('Connected to DB'))
 	.catch(e => console.log(e));
 
+
 app.use('/polls', pollRouter);
 app.use('/users', userRouter);
 

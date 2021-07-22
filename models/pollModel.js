@@ -1,24 +1,14 @@
 const mongoose = require('mongoose');
+const choiceSchema = require('./choiceModel');
 const Filter = require('bad-words');
 const filter = new Filter();
-
-const choiceSchema = new mongoose.Schema({
-  text: {
-    type: String, 
-    required: [true, 'An answer choice must contain text']
-  },
-  count: {
-    type: Number,
-    default: 0
-  }
-})
 
 const pollSchema = new mongoose.Schema({
   title: {
     type: String,
     required: [true, 'A poll must have a title']
   },
-  choices: [choiceSchema]
+  choices: [choiceSchema],
 });
 
 pollSchema.pre('save', function(next){
