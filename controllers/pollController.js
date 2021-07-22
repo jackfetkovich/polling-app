@@ -57,17 +57,13 @@ exports.getPoll = async (req, res, next) => {
 
 exports.respondToPoll = async (req, res, next) => {
 	try {
-		console.log('hit func');
 		const { user, choice } = req.body;
 		const poll = await Poll.findById(req.params.id);
-		console.log('Found Poll');
 
+		poll.removePreviousVotes(user);
 		poll.choices.id(choice).votes.push({ user });
-		console.log('pushed choice');
-
 		await poll.save();
-		console.log('saved');
-
+		
 		res.status(200).json({
 			status: 'success',
 			data: {
